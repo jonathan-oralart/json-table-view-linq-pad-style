@@ -8,25 +8,22 @@
 
 ## Publish a new version
 
-Always publish from a clean, pushed checkout, so what ships is what is in git.
+Bump the version in `package.json` and merge to `main`. The version must be higher than the one
+on the [Marketplace](https://marketplace.visualstudio.com/manage/publishers/jonathan-oralart).
 
-1. Update the version in `package.json`. It must be higher than the version on the
-   [Marketplace](https://marketplace.visualstudio.com/manage/publishers/jonathan-oralart).
-2. Build the package: `npx @vscode/vsce package`
-3. Publish it, either way:
-   - Upload: on the Marketplace manage page, open the `...` menu next to the
-     extension, choose Update, and upload the `.vsix`. No token needed.
-   - CLI: `npx @vscode/vsce publish` (needs a PAT)
+[`publish.yml`](.github/workflows/publish.yml) then publishes it and creates a GitHub release with
+the `.vsix` attached. It needs no token: it uses the trusted publishing policy on the Marketplace's
+Trusted Publishing tab, which is tied to this repository and that workflow file name.
 
-To create or update the PAT:
-
-1. Go to https://dev.azure.com/jonathan0753/_usersSettings/tokens
-2. Change the access scope to "All accessible organizations"
+To publish by hand instead, run `npx @vscode/vsce@4 package`, then on the Marketplace manage page
+open the `...` menu next to the extension, choose Update, and upload the `.vsix`.
 
 ## Install in Cursor
 
 Cursor installs from Open VSX, not the VS Code Marketplace, and this extension is
-not published there. Install the packaged file instead:
+not published there. Download the `.vsix` from the
+[latest release](https://github.com/jonathan-oralart/json-table-view-linq-pad-style/releases/latest)
+and install it:
 
 ```bash
 /Applications/Cursor.app/Contents/Resources/app/bin/cursor --install-extension json-table-view-<version>.vsix

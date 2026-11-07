@@ -1,0 +1,34 @@
+# Publishes to the VS Code Marketplace when the version in package.json changes on main.
+# Authenticates through the trusted publishing policy on the Marketplace, which names this
+# file, so renaming it requires updating the policy.
+name: Publish
+
+on:
+  push:
+    branches: [main]
+    paths: [package.json]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the GitHub release
+      id-token: write # trusted publishing
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx @vscode/vsce@4 package
+      - name: Publish to the Marketplace
+        # --skip-duplicate makes this a no-op when package.json changed but the version did not
+        run: npx @vscode/vsce@4 publish --oidc --skip-duplicate --packagePath *.vsix
+      - name: Attach the .vsix to a GitHub release, for installing in Cursor
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v$(node -p "require('./package.json').version")"
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" *.vsix --generate-notes --target "$GITHUB_SHA"
