@@ -213,6 +213,7 @@ const ObjectTable = ({ json, depth = 0, defaultOpenLevels, timezone = 'Pacific/A
   if (Array.isArray(json)) return html`<${ArrayTable} arr=${json} depth=${depth} defaultOpenLevels=${defaultOpenLevels} timezone=${timezone} />`;
 
   const entries = Object.entries(json);
+  if (entries.length === 0) return html`<div class="empty-object">{}</div>`;
 
   return html`<${CollapsibleWrapper} 
     depth=${depth} 
