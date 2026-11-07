@@ -10,6 +10,9 @@ let selectedRow = null;
 let originalParent = null;
 let fullscreenWrapper = null;
 
+// Current timezone
+let currentTimezone = 'Pacific/Auckland';
+
 
 // Get the parent wrapper of a row
 function getParentWrapper(row) {
@@ -25,8 +28,8 @@ function getParentWrapper(row) {
 
 // Update fold level indicator
 function updateFoldLevelIndicator() {
-    const indicator = document.querySelector('.fold-level-indicator');
-    if (indicator) {
+    const messageDiv = document.querySelector('.fold-message');
+    if (messageDiv) {
         let message = '';
         if (selectedRow) {
             message = \`Press 1 - 10 to adjust fold level relative to selection(current: \${ openLevels })\`;
@@ -34,13 +37,7 @@ function updateFoldLevelIndicator() {
             message = \`Press 1 - 10 to adjust fold level(current: \${ openLevels })\`;
         }
 
-        indicator.innerHTML = \`
-    < div >
-    \${ message } |
-        Folding Mode: \${ foldingMode } \${ foldingMode === 'normal' ? '(hold Shift for recursive)' : '(recursive folding active)' } |
-            Navigation: ↑↓ between rows | Fullscreen: F
-            </div >
-    \`;
+        messageDiv.textContent = \`\${ message } | Folding Mode: \${ foldingMode } \${ foldingMode === 'normal' ? '(hold Shift for recursive)' : '(recursive folding active)' } | Navigation: ↑↓ between rows | Fullscreen: F\`;
     }
 }
 
@@ -244,6 +241,47 @@ function scrollIntoViewVertically(element) {
     }
 }
 
+// Format date in the specified timezone
+function formatDateInTimezone(isoDateString, timezone) {
+    const date = new Date(isoDateString);
+    
+    // Check if time is midnight (00:00 UTC)
+    const utcHours = date.getUTCHours();
+    const utcMinutes = date.getUTCMinutes();
+    
+    const options = {
+        timeZone: timezone,
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    };
+    
+    if (utcHours === 0 && utcMinutes === 0) {
+        return new Intl.DateTimeFormat('en-US', options).format(date);
+    }
+    
+    const timeOptions = {
+        ...options,
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    };
+    
+    return new Intl.DateTimeFormat('en-US', timeOptions).format(date);
+}
+
+// Update all dates with the current timezone
+function updateAllDates() {
+    const dateElements = document.querySelectorAll('.date-value');
+    dateElements.forEach(element => {
+        const isoDate = element.getAttribute('data-date');
+        if (isoDate) {
+            element.textContent = formatDateInTimezone(isoDate, currentTimezone);
+        }
+    });
+}
+
 // Get relative depth of a wrapper
 function getRelativeDepth(wrapper, referenceWrapper) {
     if (!referenceWrapper) return parseInt(wrapper.getAttribute('data-depth') || '0');
@@ -261,6 +299,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Use event delegation for click handlers
     const container = document.querySelector('.json-viewer-table');
     container.addEventListener('click', handleClick);
+    
+    // Add timezone selector listener
+    const timezoneSelect = document.getElementById('timezone-select');
+    if (timezoneSelect) {
+        timezoneSelect.addEventListener('change', (e) => {
+            currentTimezone = e.target.value;
+            updateAllDates();
+        });
+    }
 
     // Add keyboard controls
     document.addEventListener('keydown', (e) => {

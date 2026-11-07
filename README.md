@@ -2,17 +2,19 @@
 
 View JSON files as a nested, interactive table, inspired by [LinqPad](https://www.linqpad.net/)'s Dump method.
 
-![JSON Table View Screenshot](https://raw.githubusercontent.com/jonathan-oralart/jsObjectToHtmlTable/chrome_extension/main-screenshot.png)
+Supports JSON, JSONC (comments and trailing commas, such as VS Code and Zed settings files) and JSON5.
+
+![JSON Table View Screenshot](main-screenshot.png)
 
 ## Usage
 
 *   **View JSON Files:**
-    1.  Open any JSON file in VS Code
+    1.  Open any JSON, JSONC or JSON5 file in VS Code or Cursor
     2.  Either:
         * Select "JSON Table View" from the editor dropdown in the top-right corner, or
         * Right-click inside the editor and select "Open in JSON Table View" from the context menu
 
 ## Demo
 
-![JSON Table View Demo](https://raw.githubusercontent.com/jonathan-oralart/jsObjectToHtmlTable/chrome_extension/demo.gif)
+![JSON Table View Demo](demo.gif)
 

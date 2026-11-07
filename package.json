@@ -1,9 +1,10 @@
 {
     "name": "json-table-view",
     "displayName": "JSON Table View (LinqPad-Style)",
-    "description": "View JSON files as a nested table, inspired by LinqPad's Dump method.",
-    "version": "0.2.6",
+    "description": "View JSON, JSONC and JSON5 files as a nested table, inspired by LinqPad's Dump method.",
+    "version": "0.3.0",
     "publisher": "jonathan-oralart",
+    "license": "MIT",
     "icon": "icon.png",
     "engines": {
         "vscode": "^1.80.0"
@@ -18,7 +19,7 @@
     "main": "./out/extension.js",
     "repository": {
         "type": "git",
-        "url": "https://github.com/jonathan-oralart/JSON-Table-View--LinqPad-Style-"
+        "url": "https://github.com/jonathan-oralart/json-table-view-linq-pad-style"
     },
     "contributes": {
         "commands": [
@@ -30,7 +31,7 @@
         "menus": {
             "editor/context": [
                 {
-                    "when": "resourceLangId == json || resourceLangId == ejson || resourceLangId == jsonc",
+                    "when": "resourceLangId == json || resourceLangId == ejson || resourceLangId == jsonc || resourceLangId == json5 || resourceExtname == .json5",
                     "command": "json-table-view.openActiveJsonView",
                     "group": "navigation"
                 }
@@ -43,6 +44,12 @@
                 "selector": [
                     {
                         "filenamePattern": "*.json"
+                    },
+                    {
+                        "filenamePattern": "*.jsonc"
+                    },
+                    {
+                        "filenamePattern": "*.json5"
                     }
                 ]
             }
@@ -57,19 +64,20 @@
         "lint": "eslint src --ext ts"
     },
     "devDependencies": {
-        "esbuild": "^0.23.0",
-        "@types/vscode": "^1.80.0",
         "@types/node": "20.x",
-        "typescript": "^5.3.3",
-        "eslint": "^8.57.0",
+        "@types/vscode": "^1.80.0",
+        "@typescript-eslint/eslint-plugin": "^7.11.0",
         "@typescript-eslint/parser": "^7.11.0",
-        "@typescript-eslint/eslint-plugin": "^7.11.0"
+        "esbuild": "^0.23.0",
+        "eslint": "^8.57.0",
+        "typescript": "^5.3.3"
     },
     "dependencies": {
-        "preact-render-to-string": "^6.5.13",
-        "htm": "^3.1.1",
-        "preact": "^10.25.4",
         "date-fns": "^3.6.0",
-        "date-fns-tz": "^3.2.0"
+        "date-fns-tz": "^3.2.0",
+        "htm": "^3.1.1",
+        "json5": "^2.2.3",
+        "preact": "^10.25.4",
+        "preact-render-to-string": "^6.5.13"
     }
 }

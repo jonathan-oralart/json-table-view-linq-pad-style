@@ -12,3 +12,6 @@ package-lock.json
 
 README.md
 big-json-example-abacus.json
+DEV_README.md
+*.vsix
+.github
