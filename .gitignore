@@ -3,3 +3,4 @@ output.html
 big-json-example-abacus.json
 node_modules/
 out/
+*.vsix

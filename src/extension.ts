@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { getHtmlOfObjectTable } from './getHtml';
+import { parseJson } from './parseJson';
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Activating "json-table-view" extension...');
@@ -32,7 +33,9 @@ export function activate(context: vscode.ExtensionContext) {
             const langId = doc.languageId;
             console.log(`Active editor languageId: "${langId}"`);
 
-            if (langId !== 'json' && langId !== 'jsonc' && langId !== 'ejson') {
+            const isSupportedLanguage = ['json', 'jsonc', 'json5', 'ejson'].includes(langId);
+            // VS Code has no built-in json5 language, so these usually open as plain text
+            if (!isSupportedLanguage && !doc.fileName.toLowerCase().endsWith('.json5')) {
                 vscode.window.showInformationMessage(`The active editor is not a supported JSON file (languageId: ${langId}).`);
                 return;
             }
@@ -64,7 +67,7 @@ export function activate(context: vscode.ExtensionContext) {
                         }
 
                         console.log('Parsing JSON content...');
-                        const jsonContent = JSON.parse(text);
+                        const jsonContent = parseJson(text);
                         const defaultOpenLevels = vscode.workspace.getConfiguration('json-table-view').get('defaultOpenLevels', 3);
                         console.log('JSON parsed successfully. Setting webview HTML.');
                         panel.webview.html = getHtmlOfObjectTable(jsonContent, defaultOpenLevels);
@@ -134,7 +137,7 @@ class JsonTableViewProvider implements vscode.CustomTextEditorProvider {
                         return;
                     }
 
-                    const jsonContent = JSON.parse(text);
+                    const jsonContent = parseJson(text);
                     const defaultOpenLevels = vscode.workspace.getConfiguration('json-table-view').get('defaultOpenLevels', 3);
                     webviewPanel.webview.html = getHtmlOfObjectTable(jsonContent, defaultOpenLevels);
                 } catch (error) {
