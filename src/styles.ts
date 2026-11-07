@@ -184,7 +184,8 @@ td .array-table {
   font-style: italic;
 }
 
-.empty-array {
+.empty-array,
+.empty-object {
   color: #999;
   font-style: italic;
   padding: 2px 5px;
