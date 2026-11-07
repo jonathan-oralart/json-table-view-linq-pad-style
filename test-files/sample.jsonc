@@ -1,0 +1,45 @@
+// JSONC: line comments, block comments and trailing commas
+{
+    /* Block comment before a key */
+    "name": "Orders export",
+    "generatedAt": "2026-11-07T04:43:09Z", // renders in the chosen timezone
+    "active": true,
+    "notes": null,
+    "emptyList": [],
+    "emptyObject": {},
+
+    "url": "https://example.com/path?x=1&y=2", // the // inside this string is not a comment
+    "commentLookalike": "/* not a comment */",
+
+    // An array of objects should render as a table
+    "orders": [
+        {
+            "id": 1001,
+            "customer": { "name": "Mere Tamati", "city": "Rotorua" },
+            "total": 149.5,
+            "placedAt": "2026-10-01T09:30:00Z",
+            "items": [
+                { "sku": "A-100", "qty": 2, "price": 49.75 },
+                { "sku": "B-200", "qty": 1, "price": 50.0 }, // trailing comma next
+            ],
+        },
+        {
+            "id": 1002,
+            "customer": { "name": "Søren Ægir", "city": "Århus" },
+            "total": 0,
+            "placedAt": "2026-10-02T23:59:59+13:00",
+            "items": [],
+        },
+        {
+            // Different keys from the rows above
+            "id": 1003,
+            "customer": null,
+            "status": "cancelled",
+        },
+    ],
+
+    "matrix": [
+        [1, 2, 3],
+        [4, 5, 6,],
+    ],
+}

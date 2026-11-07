@@ -1,0 +1,5 @@
+// Should show a parse error pointing at line 4
+{
+    valid: 'this line is fine',
+    missingComma: 1 oops: 2,
+}
