@@ -2,7 +2,7 @@
 
 View JSON files as a nested, interactive table, inspired by [LinqPad](https://www.linqpad.net/)'s Dump method.
 
-![JSON Table View Screenshot](https://raw.githubusercontent.com/jonathan-oralart/jsObjectToHtmlTable/chrome_extension/main-screenshot.png)
+![JSON Table View Screenshot](main-screenshot.png)
 
 ## Usage
 
@@ -14,5 +14,5 @@ View JSON files as a nested, interactive table, inspired by [LinqPad](https://ww
 
 ## Demo
 
-![JSON Table View Demo](https://raw.githubusercontent.com/jonathan-oralart/jsObjectToHtmlTable/chrome_extension/demo.gif)
+![JSON Table View Demo](demo.gif)
 
