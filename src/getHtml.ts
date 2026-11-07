@@ -14,7 +14,7 @@ const isISODate = (value: unknown): boolean => {
     value[4] === '-' && value[7] === '-' && value[10] === 'T';
 };
 
-const formatDate = (value: Date | string): string => {
+const formatDate = (value: Date | string, timezone: string = 'Pacific/Auckland'): string => {
   const date = value instanceof Date ? value : parseISO(value);
 
   if (!isValid(date)) {
@@ -26,17 +26,23 @@ const formatDate = (value: Date | string): string => {
   const utcMinutes = date.getUTCMinutes();
 
   if (utcHours === 0 && utcMinutes === 0) {
-    return formatInTimeZone(date, 'UTC', 'EEE, MMM d, yyyy');
+    return formatInTimeZone(date, timezone, 'EEE, MMM d, yyyy');
   }
 
-  return formatInTimeZone(date, 'UTC', 'EEE, MMM d, yyyy h:mm a');
+  return formatInTimeZone(date, timezone, 'EEE, MMM d, yyyy h:mm a');
 };
 
-const formatPrimitive = (value: unknown): string | VNode | unknown => {
+const formatPrimitive = (value: unknown, timezone: string = 'Pacific/Auckland'): string | VNode | unknown => {
   if (value === undefined) return showUndefined ? 'undefined' : '';
   if (Number.isNaN(value)) return 'NaN';
-  if (value instanceof Date) return formatDate(value);
-  if (isISODate(value)) return formatDate(value as string);
+  if (value instanceof Date) {
+    const formatted = formatDate(value, timezone);
+    return html`<span class="date-value" data-date=${value.toISOString()}>${formatted}</span>`;
+  }
+  if (isISODate(value)) {
+    const formatted = formatDate(value as string, timezone);
+    return html`<span class="date-value" data-date=${value}>${formatted}</span>`;
+  }
   if (value === '') return showEmptyStrings ? html`<span className="empty-string">""</span>` : '';
   if (typeof value === 'string') return makeUrlsClickable(value);
   return value;
@@ -76,17 +82,18 @@ const isObject = (value: unknown): boolean => typeof value === 'object' && value
 const isComplexType = (value: unknown): boolean => typeof value === 'object' && value !== null;
 const isPrimitive = (value: unknown): boolean => !isComplexType(value);
 
-const TableCell = ({ content, depth, defaultOpenLevels }: {
+const TableCell = ({ content, depth, defaultOpenLevels, timezone = 'Pacific/Auckland' }: {
   content: unknown;
   depth: number;
   defaultOpenLevels: number;
+  timezone?: string;
 }) => {
   const cellType = getCellType(content);
   let cellContent;
 
   switch (cellType) {
     case 'complex':
-      cellContent = renderContent(content, depth + 1, defaultOpenLevels);
+      cellContent = renderContent(content, depth + 1, defaultOpenLevels, timezone);
       break;
     case 'date':
     case 'number':
@@ -94,7 +101,7 @@ const TableCell = ({ content, depth, defaultOpenLevels }: {
     case 'string':
     case 'undefined':
     case 'nan':
-      cellContent = formatPrimitive(content);
+      cellContent = formatPrimitive(content, timezone);
       break;
     case 'boolean':
       cellContent = content ? '✓' : '•';
@@ -108,13 +115,13 @@ const TableCell = ({ content, depth, defaultOpenLevels }: {
 
 const TableHeader = ({ content }: { content: string }) => html`<th>${content}</th>`;
 
-const PrimitiveArrayTable = ({ arr }: { arr: unknown[] }) => (
+const PrimitiveArrayTable = ({ arr, timezone = 'Pacific/Auckland' }: { arr: unknown[]; timezone?: string }) => (
   html`<table class="array-table">
         <tbody>
           <tr>
             ${arr.map((item, index) => {
     const cellType = getCellType(item);
-    return html`<td key=${index} class="${cellType}-cell">${formatPrimitive(item)}</td>`;
+    return html`<td key=${index} class="${cellType}-cell">${formatPrimitive(item, timezone)}</td>`;
   })}
           </tr>
         </tbody>
@@ -150,19 +157,20 @@ const CollapsibleWrapper = ({ children, depth, isArray, itemCount, defaultOpenLe
       </div>`;
 };
 
-const renderContent = (value: unknown, depth: number, defaultOpenLevels: number) => {
-  if (Array.isArray(value)) return html`<${ArrayTable} arr=${value} depth=${depth} defaultOpenLevels=${defaultOpenLevels} />`;
-  if (isObject(value)) return html`<${ObjectTable} json=${value} depth=${depth} defaultOpenLevels=${defaultOpenLevels} />`;
-  return formatPrimitive(value);
+const renderContent = (value: unknown, depth: number, defaultOpenLevels: number, timezone: string = 'Pacific/Auckland') => {
+  if (Array.isArray(value)) return html`<${ArrayTable} arr=${value} depth=${depth} defaultOpenLevels=${defaultOpenLevels} timezone=${timezone} />`;
+  if (isObject(value)) return html`<${ObjectTable} json=${value} depth=${depth} defaultOpenLevels=${defaultOpenLevels} timezone=${timezone} />`;
+  return formatPrimitive(value, timezone);
 };
 
-const ArrayTable = ({ arr, depth = 0, defaultOpenLevels }: {
+const ArrayTable = ({ arr, depth = 0, defaultOpenLevels, timezone = 'Pacific/Auckland' }: {
   arr: unknown[];
   depth?: number;
   defaultOpenLevels: number;
+  timezone?: string;
 }) => {
   if (arr.length === 0) return html`<div class="empty-array">[]</div>`;
-  if (arr.every(isPrimitive)) return html`<${PrimitiveArrayTable} arr=${arr} />`;
+  if (arr.every(isPrimitive)) return html`<${PrimitiveArrayTable} arr=${arr} timezone=${timezone} />`;
 
   const headers = Array.from(new Set(arr.flatMap(item =>
     isObject(item) ? Object.keys(item as object) : ['Value']
@@ -185,7 +193,8 @@ const ArrayTable = ({ arr, depth = 0, defaultOpenLevels }: {
             key=${`cell-${rowIndex}-${colIndex}`} 
             content=${isObject(item) ? (item as Record<string, unknown>)[header] : header === 'Value' ? item : ''} 
             depth=${depth} 
-            defaultOpenLevels=${defaultOpenLevels} 
+            defaultOpenLevels=${defaultOpenLevels}
+            timezone=${timezone}
           />`)}
         </tr>`)}
       </tbody>
@@ -193,14 +202,15 @@ const ArrayTable = ({ arr, depth = 0, defaultOpenLevels }: {
   </${CollapsibleWrapper}>`;
 };
 
-const ObjectTable = ({ json, depth = 0, defaultOpenLevels }: {
+const ObjectTable = ({ json, depth = 0, defaultOpenLevels, timezone = 'Pacific/Auckland' }: {
   json: Record<string, unknown> | null | undefined;
   depth?: number;
   defaultOpenLevels: number;
+  timezone?: string;
 }) => {
   if (json === undefined) return html`<div>Error: Invalid JSON data</div>`;
   if (json === null) return html`<div>null</div>`;
-  if (Array.isArray(json)) return html`<${ArrayTable} arr=${json} depth=${depth} defaultOpenLevels=${defaultOpenLevels} />`;
+  if (Array.isArray(json)) return html`<${ArrayTable} arr=${json} depth=${depth} defaultOpenLevels=${defaultOpenLevels} timezone=${timezone} />`;
 
   const entries = Object.entries(json);
 
@@ -213,39 +223,53 @@ const ObjectTable = ({ json, depth = 0, defaultOpenLevels }: {
       <tbody>
         ${entries.map(([key, value], index) => html`<tr key=${`row-${index}`}>
           <${TableHeader} content=${key} />
-          <${TableCell} content=${value} depth=${depth} defaultOpenLevels=${defaultOpenLevels} />
+          <${TableCell} content=${value} depth=${depth} defaultOpenLevels=${defaultOpenLevels} timezone=${timezone} />
         </tr>`)}
       </tbody>
     </table>
   </${CollapsibleWrapper}>`;
 };
 
-const GenerateJsObjectHtml = ({ jsonData, defaultOpenLevels = 3, depth = 0 }: {
+const GenerateJsObjectHtml = ({ jsonData, defaultOpenLevels = 3, depth = 0, timezone = 'Pacific/Auckland' }: {
   jsonData: unknown;
   defaultOpenLevels?: number;
   depth?: number;
+  timezone?: string;
 }) => {
   if (jsonData === undefined) return html`<div>Error: Invalid JSON data</div>`;
   if (jsonData === null) return html`<div>null</div>`;
   if (typeof jsonData === 'string') return html`<div class="plain-string">${jsonData}</div>`;
-  if (jsonData instanceof Date) return html`<div class="plain-date">${formatDate(jsonData)}</div>`;
+  if (jsonData instanceof Date) {
+    const formatted = formatDate(jsonData, timezone);
+    return html`<div class="plain-date"><span class="date-value" data-date=${jsonData.toISOString()}>${formatted}</span></div>`;
+  }
 
   if (typeof jsonData === 'object') {
     if (Array.isArray(jsonData)) {
-      return html`<${ArrayTable} arr=${jsonData} depth=${depth} defaultOpenLevels=${defaultOpenLevels} />`;
+      return html`<${ArrayTable} arr=${jsonData} depth=${depth} defaultOpenLevels=${defaultOpenLevels} timezone=${timezone} />`;
     }
-    return html`<${ObjectTable} json=${jsonData} depth=${depth} defaultOpenLevels=${defaultOpenLevels} />`;
+    return html`<${ObjectTable} json=${jsonData} depth=${depth} defaultOpenLevels=${defaultOpenLevels} timezone=${timezone} />`;
   }
 
-  return formatPrimitive(jsonData);
+  return formatPrimitive(jsonData, timezone);
 };
 
 /** Converts a JavaScript object into an interactive HTML table view with collapsible sections */
 // deno-lint-ignore no-explicit-any
 export function getHtmlOfObjectTable(object: any, defaultOpenLevels = 3): string {
   const content = render(html`<div class="json-viewer-table">
-    <div class="fold-level-indicator">Press 1-10 to adjust fold level (current: ${defaultOpenLevels}) | Folding Mode: normal (hold Shift for recursive)</div>
-    ${GenerateJsObjectHtml({ jsonData: object, defaultOpenLevels })}
+    <div class="fold-level-indicator">
+      <div class="fold-message">Press 1-10 to adjust fold level (current: ${defaultOpenLevels}) | Folding Mode: normal (hold Shift for recursive)</div>
+      <div class="timezone-selector">
+        <label>Timezone: 
+          <select id="timezone-select">
+            <option value="Pacific/Auckland" selected>NZ</option>
+            <option value="UTC">UTC</option>
+          </select>
+        </label>
+      </div>
+    </div>
+    ${GenerateJsObjectHtml({ jsonData: object, defaultOpenLevels, timezone: 'Pacific/Auckland' })}
   </div>`);
 
 

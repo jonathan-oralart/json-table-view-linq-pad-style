@@ -265,11 +265,50 @@ td .array-table {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.fold-message {
+  flex: 1;
+  min-width: 300px;
 }
 
 .fold-level-indicator .selected-path {
   color: #4a6da7;
   font-weight: bold;
+}
+
+.timezone-selector {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.timezone-selector label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+}
+
+.timezone-selector select {
+  padding: 2px 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background-color: white;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.timezone-selector select:hover {
+  border-color: #4a6da7;
+}
+
+.timezone-selector select:focus {
+  outline: 2px solid #4a6da7;
+  outline-offset: 1px;
 }
 
 .fullscreen-button {
