@@ -1,6 +1,6 @@
-# Publishes to the VS Code Marketplace when the version in package.json changes on main.
-# Authenticates through the trusted publishing policy on the Marketplace, which names this
-# file, so renaming it requires updating the policy.
+# Publishes to the VS Code Marketplace and Open VSX when the version in package.json changes on main.
+# Both authenticate through a trusted publishing policy on the registry, which names this file, so
+# renaming it requires updating both policies.
 name: Publish
 
 on:
@@ -32,3 +32,7 @@ jobs:
         run: |
           tag="v$(node -p "require('./package.json').version")"
           gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" *.vsix --generate-notes --target "$GITHUB_SHA"
+      # Last, so a failure here leaves the Marketplace version and the release in place
+      - name: Publish to Open VSX, for Cursor
+        # --skip-duplicate makes this a no-op when package.json changed but the version did not
+        run: npx ovsx@1 publish --trusted-publishing --skip-duplicate *.vsix

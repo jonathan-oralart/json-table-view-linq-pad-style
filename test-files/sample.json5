@@ -1,0 +1,36 @@
+// JSON5: everything JSONC allows, plus the syntax below
+{
+    unquotedKey: 'single-quoted string',
+    'quoted-key': "double-quoted string",
+    $dollar_key: 'identifiers can start with $ or _',
+
+    multiLine: 'line one \
+continues on the same line',
+    escapes: 'tab\there, newline\nthere, quote \' done',
+
+    /* Numbers */
+    numbers: {
+        hex: 0xDEADBEEF,
+        leadingDot: .5,
+        trailingDot: 5.,
+        explicitPlus: +1,
+        negative: -42,
+        exponent: 1.5e3,
+        infinity: Infinity,
+        negativeInfinity: -Infinity,
+        notANumber: NaN,
+    },
+
+    // An array of objects should render as a table
+    users: [
+        { id: 1, name: 'Ana', roles: ['admin', 'editor',], lastSeen: '2026-11-01T08:00:00Z', },
+        { id: 2, name: 'Tane', roles: [], lastSeen: null, },
+        { id: 3, name: 'Li', nested: { deep: { deeper: { deepest: 'level 4', }, }, }, },
+    ],
+
+    settings: {
+        enabled: true,
+        retries: 3,
+        tags: ['a', 'b', 'c',],
+    },
+}
