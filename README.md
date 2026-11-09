@@ -18,3 +18,7 @@ Supports JSON, JSONC (comments and trailing commas, such as VS Code and Zed sett
 
 ![JSON Table View Demo](demo.gif)
 
+## Source and issues
+
+The source is on [GitHub](https://github.com/oralart-infra/json-table-view-linq-pad-style), where you can also report problems.
+
