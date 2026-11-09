@@ -26,7 +26,7 @@ Cursor installs from Open VSX, not the VS Code Marketplace. Search for
 "JSON Table View" in its extensions panel.
 
 To install a specific version, download the `.vsix` from the
-[releases](https://github.com/jonathan-oralart/json-table-view-linq-pad-style/releases) and run:
+[releases](https://github.com/oralart-infra/json-table-view-linq-pad-style/releases) and run:
 
 ```bash
 /Applications/Cursor.app/Contents/Resources/app/bin/cursor --install-extension json-table-view-<version>.vsix
@@ -44,7 +44,7 @@ exists in a namespace you own, so the first version goes up by hand.
    `npx ovsx create-namespace jonathan-oralart -p <token>`, then delete the token.
 4. [Claim the namespace](https://github.com/EclipseFdn/open-vsx.org/issues/new?template=claim-namespace-ownership.yml)
    with Option 1 and wait for approval. Open VSX holds an extension that is also on the Marketplace until you own its namespace.
-5. Upload the `.vsix` from the [latest release](https://github.com/jonathan-oralart/json-table-view-linq-pad-style/releases/latest)
+5. Upload the `.vsix` from the [latest release](https://github.com/oralart-infra/json-table-view-linq-pad-style/releases/latest)
    with Publish > Publish Extension on open-vsx.org.
 6. In [Settings > Trusted Publishers](https://open-vsx.org/user-settings/trusted-publishers), add
    this repository with the workflow file `publish.yml`.
